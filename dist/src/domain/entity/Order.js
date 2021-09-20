@@ -6,10 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Cpf_1 = __importDefault(require("./Cpf"));
 const OrderItem_1 = __importDefault(require("./OrderItem"));
 class Order {
-    constructor(cpf) {
+    constructor(cpf, issueDate = new Date(), sequence = 1) {
         this.cpf = new Cpf_1.default(cpf);
         this.items = [];
         this.deliveryPrice = 0;
+        this.issueDate = issueDate;
+        this.sequence = sequence;
+        this.code = `${this.issueDate.getFullYear()}${new String(sequence).padStart(8, '0')}`;
     }
     addItem(id, price, quantity) {
         this.items.push(new OrderItem_1.default(id, price, quantity));
