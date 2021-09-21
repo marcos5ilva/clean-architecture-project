@@ -18,6 +18,7 @@ const PlaceOrder_1 = __importDefault(require("../../src/application/PlaceOrder")
 const PlaceOrderInput_1 = __importDefault(require("../../src/application/PlaceOrderInput"));
 const ItemRepositoryDatabase_1 = __importDefault(require("../../src/infra/repository/database/ItemRepositoryDatabase"));
 const PgPromisseDatabase_1 = __importDefault(require("../../src/infra/database/PgPromisseDatabase"));
+const OrderRepositoryMemery_1 = __importDefault(require("../../src/infra/repository/memory/OrderRepositoryMemery"));
 test('Should place order', function () {
     return __awaiter(this, void 0, void 0, function* () {
         const input = new PlaceOrderInput_1.default({
@@ -32,7 +33,8 @@ test('Should place order', function () {
         });
         const itemRepository = new ItemRepositoryDatabase_1.default(new PgPromisseDatabase_1.default());
         const couponRepository = new CouponRepositoryMemory_1.default();
-        const placeOrder = new PlaceOrder_1.default(itemRepository, couponRepository);
+        const orderRepository = new OrderRepositoryMemery_1.default();
+        const placeOrder = new PlaceOrder_1.default(itemRepository, couponRepository, orderRepository);
         const output = yield placeOrder.execute(input);
         expect(output.total).toBe(5982);
     });
@@ -51,7 +53,8 @@ test('Should place order with expired discount coupon', function () {
         });
         const itemRepository = new ItemRepositoryMemory_1.default();
         const couponRepository = new CouponRepositoryMemory_1.default();
-        const placeOrder = new PlaceOrder_1.default(itemRepository, couponRepository);
+        const orderRepository = new OrderRepositoryMemery_1.default();
+        const placeOrder = new PlaceOrder_1.default(itemRepository, couponRepository, orderRepository);
         const output = yield placeOrder.execute(input);
         expect(output.total).toBe(7400);
     });
@@ -70,8 +73,30 @@ test('Should place order with delivery price included', function () {
         });
         const itemRepository = new ItemRepositoryMemory_1.default();
         const couponRepository = new CouponRepositoryMemory_1.default();
-        const placeOrder = new PlaceOrder_1.default(itemRepository, couponRepository);
+        const orderRepository = new OrderRepositoryMemery_1.default();
+        const placeOrder = new PlaceOrder_1.default(itemRepository, couponRepository, orderRepository);
         const output = yield placeOrder.execute(input);
         expect(output.deliveryPrice).toBe(310);
+    });
+});
+test('Should place order with code added', function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        const input = new PlaceOrderInput_1.default({
+            cpf: '778.278.412-36',
+            zipcode: 'L5B4L3',
+            items: [
+                { id: '1', quantity: 2 },
+                { id: '2', quantity: 1 },
+                { id: '3', quantity: 3 }
+            ],
+            coupon: 'GET20EXPIRED',
+            issueDate: new Date('2020-10-10')
+        });
+        const itemRepository = new ItemRepositoryMemory_1.default();
+        const couponRepository = new CouponRepositoryMemory_1.default();
+        const orderRepository = new OrderRepositoryMemery_1.default();
+        const placeOrder = new PlaceOrder_1.default(itemRepository, couponRepository, orderRepository);
+        const output = yield placeOrder.execute(input);
+        expect(output.code).toBe('202000000001');
     });
 });

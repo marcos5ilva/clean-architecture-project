@@ -7,25 +7,28 @@ import Order from '../domain/entity/Order';
 import PlaceOrderInput from './PlaceOrderInput';
 import PlaceOrderOutput from './PlaceOrderOutput';
 import ZipcodeCalculatorAPIMemory from '../infra/gateway/memory/ZipcodeCalculatorAPIMemory';
+import OrderRepository from '../domain/repository/OrderRepository';
 
 export default class PlaceOrder {
-	orders: Order[];
 	zipcodeCalculator: ZipcodeCalculatorAPIMemory;
 	itemRepository: ItemRepository;
 	couponRepository: CouponRepository;
+	orderRepository: OrderRepository;
 
 	constructor(
 		itemRepository: ItemRepository,
-		couponRepository: CouponRepository
+		couponRepository: CouponRepository,
+		orderRepository: OrderRepository
 	) {
 		this.itemRepository = itemRepository;
 		this.couponRepository = couponRepository;
-		this.orders = [];
+		this.orderRepository = orderRepository;
 		this.zipcodeCalculator = new ZipcodeCalculatorAPIMemory();
 	}
 
 	async execute(input: PlaceOrderInput): Promise<PlaceOrderOutput> {
-		const order = new Order(input.cpf);
+		const sequence = this.orderRepository.count() + 1;
+		const order = new Order(input.cpf, input.issueDate, sequence);
 		const distance = this.zipcodeCalculator.calculate(input.zipcode, 'L5B4L3');
 		for (const orderItem of input.items) {
 			//const item = this.items.find(item => item.id === orderItem.id);
@@ -44,7 +47,11 @@ export default class PlaceOrder {
 			if (coupon) order.addCoupon(coupon);
 		}
 		const total = order.getTotal();
-		this.orders.push(order);
-		return new PlaceOrderOutput({ deliveryPrice: order.deliveryPrice, total });
+		this.orderRepository.save(order);
+		return new PlaceOrderOutput({
+			code: order.code.value,
+			deliveryPrice: order.deliveryPrice,
+			total
+		});
 	}
 }

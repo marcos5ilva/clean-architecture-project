@@ -17,15 +17,16 @@ const Order_1 = __importDefault(require("../domain/entity/Order"));
 const PlaceOrderOutput_1 = __importDefault(require("./PlaceOrderOutput"));
 const ZipcodeCalculatorAPIMemory_1 = __importDefault(require("../infra/gateway/memory/ZipcodeCalculatorAPIMemory"));
 class PlaceOrder {
-    constructor(itemRepository, couponRepository) {
+    constructor(itemRepository, couponRepository, orderRepository) {
         this.itemRepository = itemRepository;
         this.couponRepository = couponRepository;
-        this.orders = [];
+        this.orderRepository = orderRepository;
         this.zipcodeCalculator = new ZipcodeCalculatorAPIMemory_1.default();
     }
     execute(input) {
         return __awaiter(this, void 0, void 0, function* () {
-            const order = new Order_1.default(input.cpf);
+            const sequence = this.orderRepository.count() + 1;
+            const order = new Order_1.default(input.cpf, input.issueDate, sequence);
             const distance = this.zipcodeCalculator.calculate(input.zipcode, 'L5B4L3');
             for (const orderItem of input.items) {
                 //const item = this.items.find(item => item.id === orderItem.id);
@@ -44,8 +45,12 @@ class PlaceOrder {
                     order.addCoupon(coupon);
             }
             const total = order.getTotal();
-            this.orders.push(order);
-            return new PlaceOrderOutput_1.default({ deliveryPrice: order.deliveryPrice, total });
+            this.orderRepository.save(order);
+            return new PlaceOrderOutput_1.default({
+                code: order.code.value,
+                deliveryPrice: order.deliveryPrice,
+                total
+            });
         });
     }
 }

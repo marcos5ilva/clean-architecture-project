@@ -45,5 +45,5 @@ test('Should create a order calculating the order code', function () {
 	order.addItem('2', 5000, 1);
 	order.addItem('3', 30, 3);
 	order.addCoupon(new Coupon('GET20', 20, new Date('2020-10-10')));
-	expect(order.code).toBe('202000000002');
+	expect(order.code.value).toBe('202000000002');
 });
