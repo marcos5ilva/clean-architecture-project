@@ -8,6 +8,12 @@ class PgPromisseDatabase {
     constructor() {
         this.pgp = pg_promise_1.default()('postgres://postgres:postdb1234@localhost:5432/app');
     }
+    static getInstance() {
+        if (!PgPromisseDatabase.instance) {
+            PgPromisseDatabase.instance = new PgPromisseDatabase();
+        }
+        return PgPromisseDatabase.instance;
+    }
     many(query, parameters) {
         return this.pgp.query(query, parameters);
     }

@@ -31,7 +31,7 @@ test('Should place order', function () {
             ],
             coupon: 'GET20'
         });
-        const itemRepository = new ItemRepositoryDatabase_1.default(new PgPromisseDatabase_1.default());
+        const itemRepository = new ItemRepositoryDatabase_1.default(PgPromisseDatabase_1.default.getInstance());
         const couponRepository = new CouponRepositoryMemory_1.default();
         const orderRepository = new OrderRepositoryMemery_1.default();
         const placeOrder = new PlaceOrder_1.default(itemRepository, couponRepository, orderRepository);

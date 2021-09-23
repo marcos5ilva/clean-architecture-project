@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const PgPromisseDatabase_1 = __importDefault(require("../../src/infra/database/PgPromisseDatabase"));
 test('Should connect database and list items', function () {
     return __awaiter(this, void 0, void 0, function* () {
-        const pgPromisseDatabase = new PgPromisseDatabase_1.default();
+        const pgPromisseDatabase = PgPromisseDatabase_1.default.getInstance();
         const items = yield pgPromisseDatabase.many('select * from ccca.item', []);
         console.log(items);
     });

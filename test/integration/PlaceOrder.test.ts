@@ -19,7 +19,9 @@ test('Should place order', async function () {
 		],
 		coupon: 'GET20'
 	});
-	const itemRepository = new ItemRepositoryDatabase(new PgPromisseDatabase());
+	const itemRepository = new ItemRepositoryDatabase(
+		PgPromisseDatabase.getInstance()
+	);
 	const couponRepository = new CouponRepositoryMemory();
 	const orderRepository = new OrderRepositoryMemory();
 	const placeOrder = new PlaceOrder(
