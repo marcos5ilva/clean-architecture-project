@@ -1,5 +1,5 @@
 export default class OrderItem {
-	id: String;
+	id: string;
 	price: number;
 	quantity: number;
 
